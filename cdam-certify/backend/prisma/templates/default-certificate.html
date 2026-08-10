@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @page { margin: 0; }
+  body {
+    margin: 0;
+    font-family: 'Georgia', serif;
+    width: 1122px;
+    height: 793px;
+    background: #FBFAF7;
+    position: relative;
+  }
+  .border {
+    position: absolute;
+    inset: 24px;
+    border: 2px solid #0F6E56;
+    border-radius: 4px;
+  }
+  .border-inner {
+    position: absolute;
+    inset: 34px;
+    border: 1px solid #BA7517;
+    border-radius: 2px;
+  }
+  .content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 120px;
+  }
+  .eyebrow { letter-spacing: 4px; font-size: 13px; color: #85502C; text-transform: uppercase; font-family: Arial, sans-serif; }
+  h1 { font-size: 40px; color: #0F6E56; margin: 8px 0 0; }
+  .lead { font-size: 16px; color: #444; margin-top: 28px; font-family: Arial, sans-serif; }
+  .student-name { font-size: 32px; color: #1a1a1a; margin: 12px 0; font-weight: bold; }
+  .program { font-size: 18px; color: #333; margin-top: 4px; font-family: Arial, sans-serif; }
+  .meta { font-size: 13px; color: #666; margin-top: 6px; font-family: Arial, sans-serif; }
+  .footer { position: absolute; bottom: 70px; left: 120px; right: 120px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .signature { text-align: left; font-family: Arial, sans-serif; font-size: 13px; color: #333; }
+  .signature .name { font-size: 15px; font-weight: bold; margin-bottom: 2px; }
+  .qr-block { text-align: right; font-family: Arial, sans-serif; font-size: 11px; color: #666; }
+  .qr-block img { width: 90px; height: 90px; }
+  .cert-id { font-family: 'Courier New', monospace; font-size: 12px; color: #85502C; margin-top: 40px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div class="border"></div>
+  <div class="border-inner"></div>
+  <div class="content">
+    <div class="eyebrow">CDAM &middot; Chuka University</div>
+    <h1>Certificate of Completion</h1>
+    <p class="lead">This is to certify that</p>
+    <div class="student-name">{{student_name}}</div>
+    <p class="lead">has successfully completed</p>
+    <div class="program">{{program_name}}</div>
+    <div class="meta">{{program_type}} &middot; {{start_date}} to {{end_date}}</div>
+    <div class="cert-id">Certificate ID: {{cert_id}}</div>
+  </div>
+  <div class="footer">
+    <div class="signature">
+      <div class="name">{{issuer_name}}</div>
+      <div>{{issuer_title}}, CDAM</div>
+    </div>
+    <div class="qr-block">
+      <img src="{{qr_code_data_url}}" alt="Verification QR code" />
+      <div>Verify at {{verify_domain}}</div>
+    </div>
+  </div>
+</body>
+</html>

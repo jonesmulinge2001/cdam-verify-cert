@@ -1,0 +1,174 @@
+// CDAM Certify — data model
+// Chuka University CDAM Lab certificate issuance & verification platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Access control
+// ─────────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  SUPER_ADMIN // full control: manage admins, templates, all data
+  ADMIN       // day-to-day: manage students, enrollments, issue certificates
+  VIEWER      // read-only: reporting, audits
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  role         UserRole @default(ADMIN)
+  isActive     Boolean  @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  issuedCertificates Certificate[]     @relation("IssuedBy")
+  auditLogs          AuditLog[]
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Programs & students
+// ─────────────────────────────────────────────────────────────────────────
+
+enum ProgramType {
+  SHORT_COURSE
+  INTERNSHIP
+  ATTACHMENT
+}
+
+model Program {
+  id          String      @id @default(uuid())
+  name        String
+  type        ProgramType
+  cohortLabel String? // e.g. "Jan 2026 intake"
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  enrollments StudentProgram[]
+  templates   CertificateTemplate[]
+
+  @@map("programs")
+}
+
+model Student {
+  id            String   @id @default(uuid())
+  fullName      String
+  email         String  @unique
+  phone         String?
+  country       String?  // supports international cohorts
+  sourceRowRef  String?  // original Google Sheet row reference, for traceability
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  enrollments StudentProgram[]
+
+  @@index([email])
+  @@map("students")
+}
+
+enum EnrollmentStatus {
+  APPLIED
+  ENROLLED
+  COMPLETED
+  WITHDRAWN
+}
+
+model StudentProgram {
+  id          String           @id @default(uuid())
+  studentId   String
+  programId   String
+  status      EnrollmentStatus @default(APPLIED)
+  appliedAt   DateTime         @default(now())
+  enrolledAt  DateTime?
+  completedAt DateTime?
+  withdrawnAt DateTime?
+  notes       String?
+
+  student     Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  program     Program      @relation(fields: [programId], references: [id], onDelete: Cascade)
+  certificate Certificate?
+
+  @@unique([studentId, programId])
+  @@index([status])
+  @@map("student_programs")
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Certificates
+// ─────────────────────────────────────────────────────────────────────────
+
+model CertificateTemplate {
+  id          String      @id @default(uuid())
+  name        String
+  programType ProgramType
+  programId   String? // null = default template for this program type
+  htmlContent String      @db.Text
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  program      Program?      @relation(fields: [programId], references: [id])
+  certificates Certificate[]
+
+  @@map("certificate_templates")
+}
+
+enum CertificateStatus {
+  VALID
+  REVOKED
+}
+
+model Certificate {
+  id               String             @id @default(uuid())
+  certId           String             @unique // e.g. CDAM-SC-2026-00231
+  studentProgramId String             @unique
+  templateId       String
+  status           CertificateStatus  @default(VALID)
+  hash             String // sha256 tamper-evidence digest
+  qrToken          String             @unique // signed token embedded in QR
+  fileUrl          String? // Cloudinary URL of rendered PDF
+  issuedById       String
+  issuedAt         DateTime           @default(now())
+  revokedAt        DateTime?
+  revokedReason    String?
+
+  studentProgram StudentProgram      @relation(fields: [studentProgramId], references: [id])
+  template       CertificateTemplate @relation(fields: [templateId], references: [id])
+  issuedBy       User                @relation("IssuedBy", fields: [issuedById], references: [id])
+
+  @@index([certId])
+  @@map("certificates")
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Audit trail — append-only
+// ─────────────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  action     String // e.g. "CERTIFICATE_ISSUED", "STUDENT_IMPORTED"
+  entityType String
+  entityId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}

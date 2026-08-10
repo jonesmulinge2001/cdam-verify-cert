@@ -1,0 +1,98 @@
+# ================================
+# Dependencies
+# ================================
+node_modules/
+.pnpm-store/
+.yarn/
+.yarn-cache/
+
+# ================================
+# Environment variables / secrets
+# ================================
+.env
+.env.*
+!.env.example
+
+# ================================
+# Angular
+# ================================
+.angular/
+dist/
+out-tsc/
+*.ngtypecheck.ts
+
+# Angular cache
+.cache/
+
+# ================================
+# NestJS / Node
+# ================================
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ================================
+# Prisma
+# ================================
+prisma/*.db
+prisma/*.db-journal
+prisma/*.sqlite
+prisma/*.sqlite-journal
+
+# ================================
+# Build / temporary files
+# ================================
+tmp/
+temp/
+build/
+*.tmp
+*.temp
+
+# ================================
+# IDE / Editors
+# ================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+.idea/
+*.iml
+
+# ================================
+# OS generated files
+# ================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ================================
+# Windows
+# ================================
+ehthumbs.db
+
+# ================================
+# TypeScript
+# ================================
+*.tsbuildinfo
+
+# ================================
+# Testing
+# ================================
+.nyc_output/
+test-results/
+playwright-report/
+blob-report/
+
+# ================================
+# Miscellaneous
+# ================================
+*.swp
+*.swo
+*.swn
+*.bak
+*.orig

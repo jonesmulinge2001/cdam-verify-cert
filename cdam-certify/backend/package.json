@@ -1,0 +1,50 @@
+{
+  "name": "cdam-certify-backend",
+  "version": "1.0.0",
+  "description": "CDAM Certify — certificate issuance & verification API",
+  "scripts": {
+    "build": "nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:seed": "ts-node prisma/seed.ts"
+  },
+  "dependencies": {
+    "@nestjs/bullmq": "^10.1.0",
+    "@nestjs/common": "^10.3.0",
+    "@nestjs/config": "^3.2.0",
+    "@nestjs/core": "^10.3.0",
+    "@nestjs/jwt": "^10.2.0",
+    "@nestjs/passport": "^10.0.3",
+    "@nestjs/platform-express": "^10.3.0",
+    "@nestjs/throttler": "^5.1.2",
+    "@prisma/client": "^5.10.0",
+    "bcrypt": "^5.1.1",
+    "bullmq": "^5.4.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "cloudinary": "^2.0.3",
+    "csv-parse": "^5.5.5",
+    "helmet": "^7.1.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "puppeteer": "^22.4.1",
+    "qrcode": "^1.5.3",
+    "reflect-metadata": "^0.2.1",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.3.2",
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.19",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/qrcode": "^1.5.5",
+    "prisma": "^5.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
