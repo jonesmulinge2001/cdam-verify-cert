@@ -12,6 +12,7 @@ import { EnrollmentStatus } from '../../../core/models/enums';
 import { BadgeComponent, BadgeTone } from '../../../shared/components/badge/badge.component';
 import { SkeletonRowsComponent } from '../../../shared/components/skeleton/skeleton-row.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
+import { AwardLettersService } from '../../../core/services/award-letters.service';
 
 const STATUS_TONE: Record<EnrollmentStatus, BadgeTone> = {
   [EnrollmentStatus.APPLIED]: 'sand',
@@ -23,7 +24,7 @@ const STATUS_TONE: Record<EnrollmentStatus, BadgeTone> = {
 @Component({
   selector: 'app-program-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, BadgeComponent, SkeletonRowsComponent, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, SkeletonRowsComponent, EmptyStateComponent],
   template: `
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       @if (program(); as program) {
@@ -52,7 +53,19 @@ const STATUS_TONE: Record<EnrollmentStatus, BadgeTone> = {
               <span class="xs:hidden">Import</span>
             </button>
             <input #fileInput type="file" accept=".csv" class="sr-only" (change)="onFileSelected($event)" />
-
+            <button
+  type="button"
+  (click)="sendAwardLetters()"
+  [disabled]="sendingAwardLetters() || pendingAwardLetterCount() === 0"
+  class="inline-flex items-center gap-1.5 rounded-lg border border-clay-200 bg-clay-50 text-clay-800 text-sm font-medium px-4 py-2.5 hover:bg-clay-100 transition-colors disabled:opacity-50"
+>
+  @if (sendingAwardLetters()) {
+    <span class="material-icons text-[18px] animate-spin">progress_activity</span>
+  } @else {
+    <span class="material-icons text-[18px]">mail</span>
+  }
+  Send award letters ({{ pendingAwardLetterCount() }})
+</button>
             <button
               type="button"
               (click)="issueSelected()"
@@ -440,6 +453,9 @@ export class ProgramDetailComponent implements OnInit {
   protected readonly importing = signal(false);
   protected readonly issuing = signal(false);
   protected readonly selectedIds = signal<string[]>([]);
+  private readonly awardLettersService = inject(AwardLettersService);
+
+  protected readonly sendingAwardLetters = signal(false);
 
   protected readonly completedCount = computed(
     () => this.enrollments().filter((e) => e.status === 'COMPLETED').length,
@@ -463,6 +479,40 @@ export class ProgramDetailComponent implements OnInit {
       error: () => this.loading.set(false),
     });
   }
+
+  protected readonly pendingAwardLetterCount = computed(() => {
+    return this.enrollments().filter(e => 
+      e.status === 'COMPLETED' && !e.awardLetterSent
+    ).length;
+  });
+
+
+  protected sendAwardLetters(): void {
+    const pendingEnrollments = this.enrollments().filter(
+      e => e.status === 'COMPLETED' && !e.awardLetterSent
+    );
+    
+    if (pendingEnrollments.length === 0) return;
+    
+    this.sendingAwardLetters.set(true);
+    
+    // Use issueAllPending which takes a programId
+    this.awardLettersService.issueAllPending(this.programId).subscribe({
+      next: (result) => {
+        this.sendingAwardLetters.set(false);
+        this.toast.success(
+          `${result.queued} award letter${result.queued === 1 ? '' : 's'} queued`,
+          `They will be sent to completed students`
+        );
+        this.fetchEnrollments(); // Refresh to update the sent status
+      },
+      error: (error) => {
+        this.sendingAwardLetters.set(false);
+        this.toast.error('Failed to send award letters', error.message);
+      }
+    });
+  }
+
 
   protected onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;

@@ -8,13 +8,18 @@ export class StudentProgramsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findByProgram(programId: string): Promise<
-    (StudentProgram & { student: { fullName: string; email: string }; certificate: { certId: string } | null })[]
+    (StudentProgram & {
+      student: { fullName: string; email: string };
+      certificate: { certId: string } | null;
+      awardLetter: { letterId: string; emailSentAt: Date | null } | null;
+    })[]
   > {
     return this.prisma.studentProgram.findMany({
       where: { programId },
       include: {
         student: { select: { fullName: true, email: true } },
         certificate: { select: { certId: true } },
+        awardLetter: { select: { letterId: true, emailSentAt: true } },
       },
       orderBy: { appliedAt: 'desc' },
     });

@@ -10,6 +10,7 @@ import { ProgramsModule } from './programs/programs.module';
 import { StudentsModule } from './students/students.module';
 import { StudentProgramsModule } from './student-programs/student-programs.module';
 import { CertificatesModule } from './certificates/certificates.module';
+import { AwardLettersModule } from './award-letters/award-letters.module';
 import { VerifyModule } from './verify/verify.module';
 import { ImportModule } from './import/import.module';
 
@@ -37,6 +38,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     StudentsModule,
     StudentProgramsModule,
     CertificatesModule,
+    AwardLettersModule,
     VerifyModule,
     ImportModule,
   ],

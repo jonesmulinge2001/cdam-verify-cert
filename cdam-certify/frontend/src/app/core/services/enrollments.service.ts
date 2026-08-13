@@ -11,6 +11,8 @@ export interface EnrollmentRow {
   completedAt: string | null;
   student: { fullName: string; email: string };
   certificate: { certId: string } | null;
+  awardLetter: { letterId: string; emailSentAt: string | null } | null;
+  awardLetterSent?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

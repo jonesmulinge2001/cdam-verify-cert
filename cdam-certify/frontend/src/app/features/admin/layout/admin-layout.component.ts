@@ -46,7 +46,7 @@ const NAV_ITEMS: NavItem[] = [
         <div class="sidebar-brand">
           <div class="brand-mark">C</div>
           <div>
-            <p class="font-display text-sm font-medium text-black leading-none">CDAM Certify</p>
+            <p class="font-display text-sm font-medium text-black leading-none">CDAM Certifications</p>
             <p class="text-xs text-black/40 mt-0.5">Chuka University</p>
           </div>
           <button type="button" class="close-btn" (click)="sidebarOpen.set(false)" aria-label="Close navigation">

@@ -6,10 +6,12 @@ import { QrSigningService } from './qr-signing.service';
 import { PdfRendererService } from './pdf-renderer.service';
 import { CloudinaryService } from './cloudinary.service';
 import { PrismaService } from '../prisma.service';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
     BullModule.registerQueue({ name: 'certificate-generation' }, { name: 'certificate-email' }),
+    MailModule
   ],
   controllers: [CertificatesController],
   providers: [
