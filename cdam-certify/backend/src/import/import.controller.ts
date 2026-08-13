@@ -2,14 +2,15 @@ import {
   BadRequestException,
   Controller,
   Param,
+  ParseEnumPipe,
   Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UserRole } from '@prisma/client';
+import { ProgramType, UserRole } from '@prisma/client';
 import { ImportService } from './import.service';
-import { ImportResult } from './dto/import-result.dto';
+import { DomainImportResult, ImportResult } from './dto/import-result.dto';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser, AuthenticatedUser } from '../common/decorators/current-user.decorator';
 
@@ -41,5 +42,28 @@ export class ImportController {
     }
 
     return this.importService.importFromCsv(programId, file.buffer, user.id);
+  }
+
+  /**
+   * For sheets that cover several cohorts in one tab via a Domain column
+   * (e.g. an internships sheet spanning multiple departments). Programs are
+   * matched by name or auto-created under the given ProgramType.
+   */
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @Post('students-by-domain/:programType')
+  @UseInterceptors(FileInterceptor('file'))
+  async importStudentsByDomain(
+    @Param('programType', new ParseEnumPipe(ProgramType)) programType: ProgramType,
+    @UploadedFile() file: UploadedCsvFile | undefined,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<DomainImportResult> {
+    if (!file) {
+      throw new BadRequestException('Attach a CSV file exported from your Google Sheet');
+    }
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      throw new BadRequestException('File is too large — export a single sheet at a time');
+    }
+
+    return this.importService.importByDomain(programType, file.buffer, user.id);
   }
 }

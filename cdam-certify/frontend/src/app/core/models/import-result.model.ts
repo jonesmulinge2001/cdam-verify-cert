@@ -9,3 +9,8 @@ export interface ImportResult {
   skippedDuplicates: number;
   errors: ImportRowError[];
 }
+
+export interface DomainImportResult extends ImportResult {
+  programsCreated: string[];
+  programsMatched: string[];
+}
