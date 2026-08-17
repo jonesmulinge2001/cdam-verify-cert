@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, Logger, NotFoundException, ServiceUnav
 import { AwardLetter } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { PdfRendererService } from '../certificates/pdf-renderer.service';
-import { CloudinaryService } from '../certificates/cloudinary.service';
+import { CloudinaryService, CdamDocumentType } from '../cloudinary/cloudinary.service';
 import { MailService } from '../mail/mail.service';
 import { renderTemplate } from '../certificates/template-renderer.util';
 
@@ -57,7 +57,7 @@ export class AwardLettersService {
     });
 
     const pdfBuffer = await this.pdfRenderer.renderHtmlToPdf(html);
-    const fileUrl = await this.cloudinary.uploadPdf(pdfBuffer, letterId);
+    const fileUrl = await this.cloudinary.uploadPdf(pdfBuffer, letterId, CdamDocumentType.AWARD_LETTER);
 
     const awardLetter = await this.prisma.awardLetter.create({
       data: {

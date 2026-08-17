@@ -6,7 +6,7 @@ import * as QRCode from 'qrcode';
 import { PrismaService } from '../prisma.service';
 import { QrSigningService } from './qr-signing.service';
 import { PdfRendererService } from './pdf-renderer.service';
-import { CloudinaryService } from './cloudinary.service';
+import { CloudinaryService, CdamDocumentType } from '../cloudinary/cloudinary.service';
 import { MailService } from '../mail/mail.service';
 import { renderTemplate } from './template-renderer.util';
 
@@ -80,7 +80,7 @@ export class CertificatesService {
     });
 
     const pdfBuffer = await this.pdfRenderer.renderHtmlToPdf(html);
-    const fileUrl = await this.cloudinary.uploadPdf(pdfBuffer, certId);
+    const fileUrl = await this.cloudinary.uploadPdf(pdfBuffer, certId, CdamDocumentType.CERTIFICATE);
     const hash = this.computeHash(certId, enrollment.student.fullName, enrollment.program.name);
 
     const certificate = await this.prisma.certificate.create({

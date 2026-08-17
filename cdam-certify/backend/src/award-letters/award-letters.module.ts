@@ -5,12 +5,13 @@ import { AwardLettersService } from './award-letters.service';
 import { AwardLetterGenerationProcessor, AwardLetterEmailProcessor } from './award-letters.processor';
 import { PrismaService } from '../prisma.service';
 import { PdfRendererService } from '../certificates/pdf-renderer.service';
-import { CloudinaryService } from '../certificates/cloudinary.service';
-import { MailModule } from 'src/mail/mail.module';
+import { MailModule } from '../mail/mail.module';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 
 @Module({
   imports: [
     MailModule,
+    CloudinaryModule,
     BullModule.registerQueue({ name: 'award-letter-generation' }, { name: 'award-letter-email' }),
   ],
   controllers: [AwardLettersController],
@@ -19,7 +20,6 @@ import { MailModule } from 'src/mail/mail.module';
     AwardLetterGenerationProcessor,
     AwardLetterEmailProcessor,
     PdfRendererService,
-    CloudinaryService,
     PrismaService,
   ],
   exports: [AwardLettersService],

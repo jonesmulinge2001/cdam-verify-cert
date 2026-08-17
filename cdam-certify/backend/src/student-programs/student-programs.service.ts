@@ -10,7 +10,7 @@ export class StudentProgramsService {
   async findByProgram(programId: string): Promise<
     (StudentProgram & {
       student: { fullName: string; email: string };
-      certificate: { certId: string } | null;
+      certificate: { certId: string; fileUrl: string | null; status: string } | null;
       awardLetter: { letterId: string; emailSentAt: Date | null } | null;
     })[]
   > {
@@ -18,7 +18,7 @@ export class StudentProgramsService {
       where: { programId },
       include: {
         student: { select: { fullName: true, email: true } },
-        certificate: { select: { certId: true } },
+        certificate: { select: { certId: true, fileUrl: true, status: true } },
         awardLetter: { select: { letterId: true, emailSentAt: true } },
       },
       orderBy: { appliedAt: 'desc' },
